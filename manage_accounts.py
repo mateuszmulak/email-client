@@ -100,8 +100,11 @@ def check_credentials():
         imap_connection = imaplib.IMAP4_SSL(account_data['imap'])
         imap_connection.login(user=account_data['login'], password=account_data['password'])
 
-    except (smtplib.SMTPServerDisconnected, smtplib.SMTPAuthenticationError):
+    except (smtplib.SMTPServerDisconnected, smtplib.SMTPAuthenticationError) as e:
+        print(e)
         return False
 
     else:
+        smtp_connection.quit()
+        imap_connection.logout()
         return True

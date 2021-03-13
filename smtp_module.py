@@ -28,6 +28,15 @@ class NewMailWindow(tk.Toplevel):
         self.message_input = tk.Text(self, height=20, highlightthickness=1)
         self.message_input.grid(column=0, row=2, columnspan=2)
 
+        if message_to_reply:
+            self.to_input.insert(0, message_to_reply['From'])
+            self.subject_input.insert(0, f'Re: {message_to_reply["Subject"]}')
+            date_parts = message_to_reply['Date'].split(' -')
+            self.message_input.insert(tk.INSERT, f'\n\n ------------------------- \n'
+                                                 f'Message written by {message_to_reply["From"]} on '
+                                                 f'{date_parts[0]}:\n\n'
+                                                 f'{message_to_reply["Body"]}')
+
         send_button = tk.Button(self, text='Send', width=60, command=self.send_email)
         send_button.grid(column=0, row=3, columnspan=2)
 
@@ -42,7 +51,8 @@ class NewMailWindow(tk.Toplevel):
             connection.starttls()
             connection.login(user=self.account['login'], password=self.account['password'])
             try:
-                connection.sendmail(from_addr=self.account['login'], to_addrs=to_address, msg=f'Subject:{subject}\n\n{message}')
+                connection.sendmail(from_addr=self.account['login'], to_addrs=to_address,
+                                    msg=f'Subject:{subject}\n\n{message}')
             except smtplib.SMTPRecipientsRefused:
                 messagebox.showerror("Error", "Recipient mail is wrong!")
             self.destroy()

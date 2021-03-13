@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import smtp_module
 import imap_module
 import manage_accounts
@@ -22,8 +23,10 @@ class MainWindow(tk.Frame):
         messages = imap.fetch_mail()
 
         from_label = tk.Label(text='From', font=('Arial', 14, 'bold'))
+        from_label.config(pady=10)
         from_label.grid(column=0, row=1, sticky='w')
         subject_label = tk.Label(text='Subject', font=('Arial', 14, 'bold'))
+        subject_label.config(pady=10)
         subject_label.grid(column=1, row=1, sticky='w')
 
         self.new_message_window = None
@@ -63,6 +66,7 @@ class ReadMail(tk.Toplevel):
 
         self.wm_title("Read mail")
         self.config(padx=20, pady=20)
+        self.new_message_window = None
 
         from_label = tk.Label(self, text=f'From: {message["From"]}')
         from_label.grid(column=0, row=0, sticky='w')
@@ -70,5 +74,19 @@ class ReadMail(tk.Toplevel):
         subject_label = tk.Label(self, text=f'Subject: {message["Subject"]}')
         subject_label.grid(column=0, row=1, sticky='w')
 
-        message_label = tk.Label(self, text=f'{message["Body"]}', height=20)
-        message_label.grid(column=0, columnspan=2, row=3)
+        separator = ttk.Separator(self, orient=tk.HORIZONTAL)
+        separator.grid(column=0, columnspan=2, row=2, sticky='ew')
+
+        message_label = tk.Label(self, text=f'{message["Body"]}', height=20, anchor="n", justify=tk.LEFT)
+        message_label.grid(column=0, columnspan=2, row=3, sticky='w')
+
+        reply_button = tk.Button(self, text='Reply', command=lambda: self.reply(message))
+        reply_button.grid(column=0, columnspan=2, row=4)
+
+    def reply(self, message):
+        self.new_message_window = smtp_module.NewMailWindow(message)
+
+    def destroy(self):
+        super(ReadMail, self).destroy()
+        if self.new_message_window:
+            self.new_message_window.destroy()

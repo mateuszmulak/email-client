@@ -19,7 +19,8 @@ class ImapModule:
             for part in msg.walk():
                 if part.get_content_type() == 'text/plain':
                     if part['Subject'] and part['From']:
-                        new_message = {'Subject': part['Subject'], 'From': part['From'], 'Body': part.get_payload()}
+                        new_message = {'Subject': part['Subject'], 'From': part['From'], 'Date': part['Date'],
+                                       'Body': part.get_payload()}
                         messages.append(new_message)
 
         return messages

@@ -11,4 +11,3 @@ root.title('Email Client')
 main = main_window.MainWindow(root)
 main.grid(row=0, column=0)
 root.mainloop()
-
