@@ -11,12 +11,12 @@ class ImapModule:
 
     def fetch_mail(self):
         self.connection.select('Inbox')
-        tmp, data = self.connection.search(None, 'ALL')
+        typ, msgnums = self.connection.search(None, 'ALL')
         messages = []
-        for num in data[0].split():
-            tmp, data = self.connection.fetch(num, '(RFC822)')
-            msg = email.message_from_bytes(data[0][1])
-            for part in msg.walk():
+        for num in msgnums[0].split():
+            typ, msgnums = self.connection.fetch(num, '(RFC822)')
+            message = email.message_from_bytes(msgnums[0][1])
+            for part in message.walk():
                 if part.get_content_type() == 'text/plain':
                     if part['Subject'] and part['From']:
                         new_message = {'Subject': part['Subject'], 'From': part['From'], 'Date': part['Date'],
