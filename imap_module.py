@@ -6,15 +6,15 @@ import manage_accounts
 class ImapModule:
     def __init__(self):
         account = manage_accounts.return_data()
-        self.imap = imaplib.IMAP4_SSL(account['imap'])
-        self.imap.login(user=account['login'], password=account['password'])
+        self.connection = imaplib.IMAP4_SSL(account['imap'])
+        self.connection.login(user=account['login'], password=account['password'])
 
     def fetch_mail(self):
-        self.imap.select('Inbox')
-        tmp, data = self.imap.search(None, 'ALL')
+        self.connection.select('Inbox')
+        tmp, data = self.connection.search(None, 'ALL')
         messages = []
         for num in data[0].split():
-            tmp, data = self.imap.fetch(num, '(RFC822)')
+            tmp, data = self.connection.fetch(num, '(RFC822)')
             msg = email.message_from_bytes(data[0][1])
             for part in msg.walk():
                 if part.get_content_type() == 'text/plain':

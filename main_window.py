@@ -3,6 +3,7 @@ import smtp_module
 import imap_module
 import manage_accounts
 
+
 class MainWindow(tk.Frame):
 
     def __init__(self, args):
@@ -16,6 +17,7 @@ class MainWindow(tk.Frame):
 
         if not manage_accounts.check_credentials():
             exit()
+
         imap = imap_module.ImapModule()
         messages = imap.fetch_mail()
 
@@ -29,8 +31,8 @@ class MainWindow(tk.Frame):
         self.opened_mails = []
 
         for i, message in enumerate(messages):
-            detail_label = tk.Label(text=message['From'])
-            detail_label.grid(column=0, row=i + 2, sticky='w')
+            from_label = tk.Label(text=message['From'])
+            from_label.grid(column=0, row=i + 2, sticky='w')
             subject_label = tk.Label(text=message['Subject'], font=('Arial', 14, 'bold'))
             subject_label.grid(column=1, row=i + 2, sticky='w')
             open_button = tk.Button(text='open', command=lambda details=message: self.open_message(details))
@@ -40,7 +42,7 @@ class MainWindow(tk.Frame):
         self.new_message_window = smtp_module.NewMailWindow()
 
     def open_message(self, message):
-        window = ReadMail(message['From'], message['Subject'], message['Body'])
+        window = ReadMail(message)
         self.opened_mails.append(window)
 
     def refresh(self):
@@ -56,17 +58,17 @@ class MainWindow(tk.Frame):
 
 
 class ReadMail(tk.Toplevel):
-    def __init__(self, from_mail, subject, message, **kw):
+    def __init__(self, message, **kw):
         super().__init__(**kw)
 
         self.wm_title("Read mail")
         self.config(padx=20, pady=20)
 
-        from_label = tk.Label(self, text=f'From: {from_mail}')
+        from_label = tk.Label(self, text=f'From: {message["From"]}')
         from_label.grid(column=0, row=0, sticky='w')
 
-        subject_label = tk.Label(self, text=f'Subject: {subject}')
+        subject_label = tk.Label(self, text=f'Subject: {message["Subject"]}')
         subject_label.grid(column=0, row=1, sticky='w')
 
-        message_label = tk.Label(self, text=f'{message}', height=20)
+        message_label = tk.Label(self, text=f'{message["Body"]}', height=20)
         message_label.grid(column=0, columnspan=2, row=3)

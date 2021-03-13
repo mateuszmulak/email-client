@@ -1,10 +1,11 @@
 import smtplib
 import tkinter as tk
 import manage_accounts
+from tkinter import messagebox
 
 
 class NewMailWindow(tk.Toplevel):
-    def __init__(self, **kw):
+    def __init__(self, message_to_reply=None, **kw):
         super().__init__(**kw)
 
         self.account = manage_accounts.return_data()
@@ -31,6 +32,7 @@ class NewMailWindow(tk.Toplevel):
         send_button.grid(column=0, row=3, columnspan=2)
 
     def send_email(self):
+
         to_address = self.to_input.get()
         subject = self.subject_input.get()
         message = self.message_input.get("1.0", "end-1c")
@@ -39,6 +41,11 @@ class NewMailWindow(tk.Toplevel):
             connection = smtplib.SMTP(self.account['smtp'])
             connection.starttls()
             connection.login(user=self.account['login'], password=self.account['password'])
-            connection.sendmail(from_addr=self.account['login'], to_addrs=to_address, msg=f'Subject:{subject}\n\n{message}')
+            try:
+                connection.sendmail(from_addr=self.account['login'], to_addrs=to_address, msg=f'Subject:{subject}\n\n{message}')
+            except smtplib.SMTPRecipientsRefused:
+                messagebox.showerror("Error", "Recipient mail is wrong!")
             self.destroy()
             self.update()
+        else:
+            messagebox.showerror("Error", "Fill all fields!")
